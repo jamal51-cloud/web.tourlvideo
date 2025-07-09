@@ -18,40 +18,49 @@
       background-size: cover;
       color: #00ffff;
       overflow-x: hidden;
+      position: relative;
     }
 
     .overlay {
       position: fixed;
       width: 100%;
       height: 100%;
-      background: radial-gradient(circle, rgba(0,0,0,0.6), rgba(0,0,0,0.9));
+      background: radial-gradient(circle at top left, rgba(0,0,50,0.6), rgba(0,0,0,0.95));
       z-index: -1;
     }
 
-    h1 {
+    h1.glitch {
       text-align: center;
       margin-top: 30px;
       font-size: 2.5rem;
-      text-shadow: 0 0 10px cyan;
+      color: cyan;
+      animation: glitch 1s infinite;
+      text-shadow: 0 0 10px cyan, 0 0 20px cyan;
+    }
+
+    @keyframes glitch {
+      0%, 100% { text-shadow: 2px 2px red, -2px -2px blue; }
+      20% { text-shadow: -2px -2px lime, 2px 2px magenta; }
+      40% { text-shadow: 2px -2px orange, -2px 2px violet; }
+      60% { text-shadow: -2px 2px yellow, 2px -2px cyan; }
+      80% { text-shadow: 2px 2px red, -2px -2px blue; }
     }
 
     .container {
-      max-width: 500px;
+      max-width: 520px;
       margin: 50px auto;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.75);
       padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px cyan;
+      border-radius: 20px;
+      box-shadow: 0 0 30px cyan;
       animation: float 4s ease-in-out infinite;
+      z-index: 1;
+      position: relative;
     }
 
     @keyframes float {
-      0%, 100% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-10px);
-      }
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
 
     label, select, input {
@@ -92,55 +101,6 @@
       font-size: 0.9rem;
     }
 
-    .star {
-      position: absolute;
-      width: 2px;
-      height: 2px;
-      background: white;
-      animation: shooting-star 5s linear infinite;
-    }
-
-    @keyframes shooting-star {
-      from {
-        transform: translateX(0) translateY(0);
-        opacity: 1;
-      }
-      to {
-        transform: translateX(-500px) translateY(500px);
-        opacity: 0;
-      }
-    }
-  
-    h1.glitch {
-      position: relative;
-      color: cyan;
-      font-size: 2.5rem;
-      text-align: center;
-      animation: glitch 1s infinite;
-      text-shadow: 0 0 5px cyan, 0 0 10px cyan;
-    }
-
-    @keyframes glitch {
-      0% {
-        text-shadow: 2px 2px red, -2px -2px blue;
-      }
-      20% {
-        text-shadow: -2px -2px lime, 2px 2px magenta;
-      }
-      40% {
-        text-shadow: 2px -2px orange, -2px 2px violet;
-      }
-      60% {
-        text-shadow: -2px 2px yellow, 2px -2px cyan;
-      }
-      80% {
-        text-shadow: 2px 2px red, -2px -2px blue;
-      }
-      100% {
-        text-shadow: 0 0 5px cyan, 0 0 10px cyan;
-      }
-    }
-
     .copy-btn {
       background: #00ffff;
       border: none;
@@ -158,21 +118,96 @@
       border-radius: 15px;
       margin-top: 20px;
       box-shadow: 0 0 10px cyan;
+      text-align: center;
     }
 
-</style>
+    .payment-box img {
+      max-width: 150px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .payment-box img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px cyan;
+    }
+
+    .popup-img {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 90vw;
+      max-height: 90vh;
+      z-index: 1000;
+      border-radius: 15px;
+      box-shadow: 0 0 40px cyan;
+    }
+
+    .popup-bg {
+      display: none;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      top: 0;
+      left: 0;
+      z-index: 999;
+    }
+
+    /* Efek bintang jatuh Ultra HD */
+    .star {
+      position: fixed;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: shoot linear infinite;
+      opacity: 0.8;
+      z-index: 0;
+      filter: drop-shadow(0 0 6px white);
+    }
+
+    @keyframes shoot {
+      0% {
+        transform: translate(100vw, -10vh) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-10vw, 100vh) scale(0.5);
+        opacity: 0;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="overlay"></div>
+
+  <!-- Efek Bintang Jatuh -->
+  <script>
+    for (let i = 0; i < 50; i++) {
+      let star = document.createElement("div");
+      star.className = "star";
+      star.style.top = Math.random() * window.innerHeight + "px";
+      star.style.left = Math.random() * window.innerWidth + "px";
+      star.style.animationDuration = (Math.random() * 3 + 2) + "s";
+      star.style.animationDelay = (Math.random() * 5) + "s";
+      document.body.appendChild(star);
+    }
+  </script>
+
   <h1 class="glitch">Toko Auto Order Juragan Mod</h1>
   <div class="container">
     <form id="orderForm">
       <label for="paket">Pilih Paket Panel:</label>
       <select id="paket" name="paket">
-        <option value="1GB RAM / 10GB Disk">Paket 1: 1GB RAM / 10GB Disk</option>
-        <option value="2GB RAM / 20GB Disk">Paket 2: 2GB RAM / 20GB Disk</option>
-        <option value="3GB RAM / 30GB Disk">Paket 3: 3GB RAM / 30GB Disk</option>
-        <option value="Unlimited Disk sampai 10GB terakhir">Paket Unli Disk</option>
+        <option value="1.3GB = 1K">1. 1.3GB = 1K</option>
+        <option value="2.6GB = 2K">2. 2.6GB = 2K</option>
+        <option value="3.8GB = 3K">3. 3.8GB = 3K</option>
+        <option value="4.10GB = 4K">4. 10GB = 4K</option>
+        <option value="5.UNLI = 5K">5. UNLI = 5K</option>
       </select>
 
       <label for="username">Username Panel:</label>
@@ -187,11 +222,19 @@
       <button type="submit">Pesan Sekarang</button>
     </form>
 
-    <h3>📌 Pembayaran:</h3>
-    <p><strong>DANA:</strong> <span id="danaNumber">083830330486</span></p>
-    <button class="copy-btn" onclick="copyDana()">Salin Nomor DANA</button>
-    <p><strong>QRIS:</strong></p>
-    <img src="" alt="QRIS" style="max-width: 100%; border-radius: 10px; box-shadow: 0 0 10px cyan;" />
+    <div class="payment-box">
+      <h3>📌 Pembayaran:</h3>
+      <p>
+        <img src="https://i.ibb.co/TBjhR23V/3362737c3572.jpg" alt="Logo DANA" width="30">
+        <strong>DANA:</strong> <span id="danaNumber">083830330486</span>
+      </p>
+      <button class="copy-btn" onclick="copyDana()">Salin Nomor DANA</button>
+      <p><strong>QRIS:</strong></p>
+      <img src="https://i.ibb.co/GvGNdJ5Y/2aa09dacfa65.jpg" alt="QRIS" id="qrisImg">
+      <p style="margin-top: 15px; font-size: 0.9rem; color: #ccc;">
+        Setelah melakukan pembayaran, langsung kirim bukti ke WhatsApp atau Telegram ya kak 🙏
+      </p>
+    </div>
 
     <div class="menu">
       <p>🔒 Reseller Panel Private: 5k – 6k</p>
@@ -199,7 +242,10 @@
     </div>
   </div>
 
-  <!-- Script -->
+  <!-- Popup QR -->
+  <div class="popup-bg" id="popupBg" onclick="closePopup()"></div>
+  <img src="https://i.ibb.co/GvGNdJ5Y/2aa09dacfa65.jpg" alt="QRIS Besar" class="popup-img" id="popupImg" />
+
   <script>
     document.getElementById("orderForm").addEventListener("submit", function(e) {
       e.preventDefault();
@@ -207,6 +253,9 @@
       let username = document.getElementById("username").value;
       let metode = document.getElementById("metode").value;
       let message = `Halo kak, saya mau pesan ${paket}%0AUsername: ${username}`;
+
+      let confirmMsg = `Kamu yakin ingin pesan:\n${paket}\nUsername: ${username}\nVia: ${metode.toUpperCase()}?`;
+      if (!confirm(confirmMsg)) return;
 
       if (metode === "wa") {
         window.open(`https://wa.me/6283830330486?text=${message}`, '_blank');
@@ -220,6 +269,20 @@
       navigator.clipboard.writeText(dana).then(() => {
         alert("Nomor DANA berhasil disalin!");
       });
+    }
+
+    const qrisImg = document.getElementById('qrisImg');
+    const popupImg = document.getElementById('popupImg');
+    const popupBg = document.getElementById('popupBg');
+
+    qrisImg.onclick = () => {
+      popupImg.style.display = 'block';
+      popupBg.style.display = 'block';
+    };
+
+    function closePopup() {
+      popupImg.style.display = 'none';
+      popupBg.style.display = 'none';
     }
   </script>
 </body>
