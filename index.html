@@ -31,22 +31,38 @@
       const formData = new FormData();
       formData.append('file', file);
 
-      status.innerText = "⏳ Mengupload...";
+      status.innerText = "⏳ Mengambil server GoFile...";
 
       try {
-        const res = await fetch('https://api.gofile.io/uploadFile', {
+        // Step 1: Ambil server upload
+        const serverRes = await fetch('https://api.gofile.io/getServer');
+        const serverData = await serverRes.json();
+
+        if (serverData.status !== "ok") {
+          status.innerText = "❌ Gagal ambil server.";
+          return;
+        }
+
+        const uploadURL = `https://${serverData.data.server}.gofile.io/uploadFile`;
+
+        status.innerText = "⏳ Mengupload ke " + serverData.data.server + "...";
+
+        // Step 2: Upload video ke server
+        const uploadRes = await fetch(uploadURL, {
           method: 'POST',
           body: formData
         });
 
-        const data = await res.json();
-        if (data.status === "ok") {
-          const url = data.data.downloadPage;
+        const uploadData = await uploadRes.json();
+
+        if (uploadData.status === "ok") {
+          const url = uploadData.data.downloadPage;
           status.innerText = "✅ Upload selesai!";
           link.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
         } else {
-          status.innerText = "❌ Gagal upload.";
+          status.innerText = "❌ Gagal upload video.";
         }
+
       } catch (err) {
         status.innerText = "⚠️ Error: " + err.message;
       }
