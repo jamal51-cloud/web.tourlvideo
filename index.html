@@ -175,29 +175,23 @@
         <option value="Unlimited Disk sampai 10GB terakhir">Paket Unli Disk</option>
       </select>
 
-      <label for="email">Email Kamu:</label>
-      <input type="email" id="email" name="email" required />
-
       <label for="username">Username Panel:</label>
       <input type="text" id="username" name="username" required />
 
-      <button type="submit">Pesan via WhatsApp</button>
-    
-    <label for="metode">Pilih Metode Kontak:</label>
-    <select id="metode" name="metode">
-      <option value="wa">WhatsApp</option>
-      <option value="tele">Telegram</option>
-    </select>
+      <label for="metode">Pilih Metode Kontak:</label>
+      <select id="metode" name="metode">
+        <option value="wa">WhatsApp</option>
+        <option value="tele">Telegram</option>
+      </select>
+
+      <button type="submit">Pesan Sekarang</button>
     </form>
 
-
-
-     <h3>📌 Pembayaran:</h3>
-      <p><strong>DANA:</strong> 083830330486</p>
-      <p><strong>QRIS:</strong></p>
-      <img src="" alt="QRIS" style="max-width: 100%; border-radius: 10px; box-shadow: 0 0 10px cyan;" />
-    </div>
-    
+    <h3>📌 Pembayaran:</h3>
+    <p><strong>DANA:</strong> <span id="danaNumber">083830330486</span></p>
+    <button class="copy-btn" onclick="copyDana()">Salin Nomor DANA</button>
+    <p><strong>QRIS:</strong></p>
+    <img src="" alt="QRIS" style="max-width: 100%; border-radius: 10px; box-shadow: 0 0 10px cyan;" />
 
     <div class="menu">
       <p>🔒 Reseller Panel Private: 5k – 6k</p>
@@ -205,31 +199,28 @@
     </div>
   </div>
 
-  <!-- Bintang jatuh -->
+  <!-- Script -->
   <script>
     document.getElementById("orderForm").addEventListener("submit", function(e) {
       e.preventDefault();
       let paket = document.getElementById("paket").value;
-      let email = document.getElementById("email").value;
       let username = document.getElementById("username").value;
       let metode = document.getElementById("metode").value;
-      let message = `Halo kak, saya mau pesan ${paket}%0AEmail: ${email}%0AUsername: ${username}`;
+      let message = `Halo kak, saya mau pesan ${paket}%0AUsername: ${username}`;
 
       if (metode === "wa") {
         window.open(`https://wa.me/6283830330486?text=${message}`, '_blank');
       } else {
-        let teleMsg = `https://t.me/Juraganmuda238`;
-        window.open(teleMsg, '_blank');
+        window.open(`https://t.me/Juraganmuda238`, '_blank');
       }
     });
 
-function copyDana() {
-  const dana = document.getElementById("danaNumber").textContent;
-  navigator.clipboard.writeText(dana).then(() => {
-    alert("Nomor DANA berhasil disalin!");
-  });
-}
-
-</script>
+    function copyDana() {
+      const dana = document.getElementById("danaNumber").textContent;
+      navigator.clipboard.writeText(dana).then(() => {
+        alert("Nomor DANA berhasil disalin!");
+      });
+    }
+  </script>
 </body>
 </html>
