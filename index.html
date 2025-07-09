@@ -5,40 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Upload Video ke GoFile</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      padding: 30px;
-      text-align: center;
-    }
-    h2 {
-      color: #333;
-    }
-    input[type="file"] {
-      padding: 10px;
-      margin: 15px 0;
-    }
+    body { font-family: sans-serif; padding: 20px; background: #f8f8f8; text-align: center; }
+    input[type="file"] { margin: 15px 0; }
     button {
       padding: 10px 20px;
-      background-color: #00b894;
-      color: white;
+      background-color: #27ae60;
       border: none;
-      border-radius: 8px;
+      border-radius: 5px;
+      color: white;
+      font-weight: bold;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #019174;
-    }
-    #status {
-      margin-top: 20px;
-      font-weight: bold;
-    }
-    #link a {
-      display: block;
-      margin-top: 10px;
-      word-break: break-word;
-      color: #0984e3;
-    }
+    #status { margin-top: 15px; font-weight: bold; color: #333; }
+    #link a { word-wrap: break-word; color: #0984e3; display: inline-block; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -46,12 +25,11 @@
   <input type="file" id="videoInput" accept="video/*">
   <br>
   <button onclick="uploadVideo()">Upload</button>
-
   <div id="status"></div>
   <div id="link"></div>
 
   <script>
-    const token = "cYzrND8N5ckkPAJYE1lIpvVRn2c5XBTO";
+    const token = "cYzrND8N5ckkPAJYE1lIpvVRn2c5XBTO"; // Token saja, tanpa folder
 
     async function uploadVideo() {
       const fileInput = document.getElementById("videoInput");
@@ -59,14 +37,14 @@
       const link = document.getElementById("link");
 
       if (!fileInput.files.length) {
-        alert("Pilih dulu video dari galeri.");
+        alert("Pilih dulu videonya.");
         return;
       }
 
       const file = fileInput.files[0];
       const formData = new FormData();
       formData.append("token", token);
-      formData.append("file", file);
+      formData.append("file", file); // hanya token + file
 
       status.innerText = "🔄 Mengambil server...";
       link.innerHTML = "";
@@ -76,27 +54,34 @@
         const serverData = await serverRes.json();
 
         if (serverData.status !== "ok") {
-          status.innerText = "❌ Gagal ambil server.";
+          status.innerText = "❌ Gagal ambil server upload.";
           return;
         }
 
         const uploadURL = `https://${serverData.data.server}.gofile.io/uploadFile`;
 
-        status.innerText = "⏫ Mengupload video...";
+        status.innerText = "⏫ Mengupload...";
 
         const uploadRes = await fetch(uploadURL, {
           method: "POST",
           body: formData
         });
 
-        const uploadData = await uploadRes.json();
+        const uploadText = await uploadRes.text(); // kita cek isi mentah
+        let uploadData;
+        try {
+          uploadData = JSON.parse(uploadText);
+        } catch (e) {
+          status.innerText = "❌ Gagal parse JSON:\n" + uploadText;
+          return;
+        }
 
         if (uploadData.status === "ok") {
           const url = uploadData.data.downloadPage;
-          status.innerText = "✅ Upload berhasil!";
+          status.innerText = "✅ Upload sukses!";
           link.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
         } else {
-          status.innerText = "❌ Gagal upload.";
+          status.innerText = "❌ Gagal upload: " + uploadData.status;
         }
 
       } catch (err) {
