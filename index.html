@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Video to URL</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
+    input[type="file"] { margin-bottom: 10px; }
+    #link { margin-top: 15px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h2>🎥 Upload Video → Dapat URL</h2>
+  <input type="file" id="videoInput" accept="video/*">
+  <button onclick="uploadVideo()">Upload</button>
+  <div id="status"></div>
+  <div id="link"></div>
+
+  <script>
+    async function uploadVideo() {
+      const fileInput = document.getElementById('videoInput');
+      const status = document.getElementById('status');
+      const link = document.getElementById('link');
+
+      if (!fileInput.files.length) {
+        alert("Pilih dulu video dari galeri.");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const formData = new FormData();
+      formData.append('file', file);
+
+      status.innerText = "⏳ Mengupload...";
+
+      try {
+        const res = await fetch('https://api.gofile.io/uploadFile', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+        if (data.status === "ok") {
+          const url = data.data.downloadPage;
+          status.innerText = "✅ Upload selesai!";
+          link.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+        } else {
+          status.innerText = "❌ Gagal upload.";
+        }
+      } catch (err) {
+        status.innerText = "⚠️ Error: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
