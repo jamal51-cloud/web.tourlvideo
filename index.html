@@ -1,67 +1,48 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upload Video ke AnonFiles</title>
-  <style>
-    body { font-family: sans-serif; text-align: center; padding: 20px; }
-    input[type="file"] { margin: 15px 0; }
-    button#upload { padding: 10px 20px; background:#27ae60; color:white; border:none; border-radius:5px; cursor:pointer; }
-    button#copy { padding: 8px 12px; background:#0984e3; color:white; border:none; border-radius:5px; cursor:pointer; display:none; margin-top:10px; }
-    #status { margin-top: 15px; font-weight:bold; }
-    #link a { color:#0984e3; word-break:break-word; }
-  </style>
+  <meta charset="UTF-8" />
+  <title>Upload Video via Telegraph</title>
 </head>
 <body>
-  <h2>🎥 Upload Video ke AnonFiles</h2>
-  <input type="file" id="videoInput" accept="video/*"><br>
-  <button id="upload" onclick="uploadAnon()">Upload</button>
-  <button id="copy" onclick="copyLink()">Salin Link</button>
-  <div id="status"></div>
-  <div id="link"></div>
+  <h2>📤 Upload Video ke Telegraph</h2>
+  <input type="file" id="fileInput" accept="video/*"><br><br>
+  <button onclick="uploadFile()">Upload</button>
+  <p id="status"></p>
+  <p id="link"></p>
 
   <script>
-    let lastURL = "";
-
-    async function uploadAnon() {
-      const file = document.getElementById('videoInput').files[0];
+    async function uploadFile() {
+      const file = document.getElementById('fileInput').files[0];
       const status = document.getElementById('status');
-      const linkDiv = document.getElementById('link');
-      const copyBtn = document.getElementById('copy');
+      const link = document.getElementById('link');
 
-      if (!file) { alert('Pilih videonya dulu ya'); return; }
+      if (!file) {
+        status.innerText = '❌ Pilih file dulu!';
+        return;
+      }
 
-      status.innerText = '⏫ Upload ke AnonFiles...';
-      linkDiv.innerHTML = '';
-      copyBtn.style.display = 'none';
-
-      const form = new FormData();
-      form.append('file', file);
+      status.innerText = '⏫ Uploading...';
+      const formData = new FormData();
+      formData.append('file', file);
 
       try {
-        const res = await fetch('https://api.anonfiles.ch/upload', {
+        const res = await fetch('https://telegra.ph/upload', {
           method: 'POST',
-          body: form
+          body: formData
         });
-        const data = await res.json();
 
-        if (data.status) {
-          lastURL = data.data.file.url.full;
+        const data = await res.json();
+        if (data[0] && data[0].src) {
+          const url = 'https://telegra.ph' + data[0].src;
           status.innerText = '✅ Upload berhasil!';
-          linkDiv.innerHTML = `<a href="${lastURL}" target="_blank">${lastURL}</a>`;
-          copyBtn.style.display = 'inline-block';
+          link.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
         } else {
-          status.innerText = '❌ Error saat upload: ' + JSON.stringify(data.error);
+          status.innerText = '❌ Gagal upload.';
         }
       } catch (e) {
-        status.innerText = '❌ Gagal upload: ' + e.message;
+        status.innerText = '❌ Error: ' + e.message;
       }
-    }
-
-    function copyLink() {
-      if (!lastURL) return;
-      navigator.clipboard.writeText(lastURL).then(() => alert('Tautan tersalin!'));
     }
   </script>
 </body>
