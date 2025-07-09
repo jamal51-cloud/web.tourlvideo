@@ -3,90 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upload Video ke GoFile</title>
+  <title>Upload Video ke AnonFiles</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #f8f8f8; text-align: center; }
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
     input[type="file"] { margin: 15px 0; }
-    button {
-      padding: 10px 20px;
-      background-color: #27ae60;
-      border: none;
-      border-radius: 5px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    #status { margin-top: 15px; font-weight: bold; color: #333; }
-    #link a { word-wrap: break-word; color: #0984e3; display: inline-block; margin-top: 10px; }
+    button#upload { padding: 10px 20px; background:#27ae60; color:white; border:none; border-radius:5px; cursor:pointer; }
+    button#copy { padding: 8px 12px; background:#0984e3; color:white; border:none; border-radius:5px; cursor:pointer; display:none; margin-top:10px; }
+    #status { margin-top: 15px; font-weight:bold; }
+    #link a { color:#0984e3; word-break:break-word; }
   </style>
 </head>
 <body>
-  <h2>🎥 Upload Video ke GoFile</h2>
-  <input type="file" id="videoInput" accept="video/*">
-  <br>
-  <button onclick="uploadVideo()">Upload</button>
+  <h2>🎥 Upload Video ke AnonFiles</h2>
+  <input type="file" id="videoInput" accept="video/*"><br>
+  <button id="upload" onclick="uploadAnon()">Upload</button>
+  <button id="copy" onclick="copyLink()">Salin Link</button>
   <div id="status"></div>
   <div id="link"></div>
 
   <script>
-    const token = "cYzrND8N5ckkPAJYE1lIpvVRn2c5XBTO"; // Token saja, tanpa folder
+    let lastURL = "";
 
-    async function uploadVideo() {
-      const fileInput = document.getElementById("videoInput");
-      const status = document.getElementById("status");
-      const link = document.getElementById("link");
+    async function uploadAnon() {
+      const file = document.getElementById('videoInput').files[0];
+      const status = document.getElementById('status');
+      const linkDiv = document.getElementById('link');
+      const copyBtn = document.getElementById('copy');
 
-      if (!fileInput.files.length) {
-        alert("Pilih dulu videonya.");
-        return;
-      }
+      if (!file) { alert('Pilih videonya dulu ya'); return; }
 
-      const file = fileInput.files[0];
-      const formData = new FormData();
-      formData.append("token", token);
-      formData.append("file", file); // hanya token + file
+      status.innerText = '⏫ Upload ke AnonFiles...';
+      linkDiv.innerHTML = '';
+      copyBtn.style.display = 'none';
 
-      status.innerText = "🔄 Mengambil server...";
-      link.innerHTML = "";
+      const form = new FormData();
+      form.append('file', file);
 
       try {
-        const serverRes = await fetch("https://api.gofile.io/getServer");
-        const serverData = await serverRes.json();
-
-        if (serverData.status !== "ok") {
-          status.innerText = "❌ Gagal ambil server upload.";
-          return;
-        }
-
-        const uploadURL = `https://${serverData.data.server}.gofile.io/uploadFile`;
-
-        status.innerText = "⏫ Mengupload...";
-
-        const uploadRes = await fetch(uploadURL, {
-          method: "POST",
-          body: formData
+        const res = await fetch('https://api.anonfiles.ch/upload', {
+          method: 'POST',
+          body: form
         });
+        const data = await res.json();
 
-        const uploadText = await uploadRes.text(); // kita cek isi mentah
-        let uploadData;
-        try {
-          uploadData = JSON.parse(uploadText);
-        } catch (e) {
-          status.innerText = "❌ Gagal parse JSON:\n" + uploadText;
-          return;
-        }
-
-        if (uploadData.status === "ok") {
-          const url = uploadData.data.downloadPage;
-          status.innerText = "✅ Upload sukses!";
-          link.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+        if (data.status) {
+          lastURL = data.data.file.url.full;
+          status.innerText = '✅ Upload berhasil!';
+          linkDiv.innerHTML = `<a href="${lastURL}" target="_blank">${lastURL}</a>`;
+          copyBtn.style.display = 'inline-block';
         } else {
-          status.innerText = "❌ Gagal upload: " + uploadData.status;
+          status.innerText = '❌ Error saat upload: ' + JSON.stringify(data.error);
         }
-
-      } catch (err) {
-        status.innerText = "⚠️ Error: " + err.message;
+      } catch (e) {
+        status.innerText = '❌ Gagal upload: ' + e.message;
       }
+    }
+
+    function copyLink() {
+      if (!lastURL) return;
+      navigator.clipboard.writeText(lastURL).then(() => alert('Tautan tersalin!'));
     }
   </script>
 </body>
